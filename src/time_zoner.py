@@ -13,19 +13,24 @@ def main() -> None:
         time_to_convert = args.time
 
     military_time:str = convert_to_military(time_to_convert)
-    converted_time:datetime.datetime = convert_to_time(military_time)
+    try:
+        converted_time:datetime.datetime = convert_to_time(military_time)
+    except ValueError:
+        print(f"[!] {time_to_convert} is not a valid time. Some examples to try: '21:00' or '9:00 PM'")
+        converted_time = None
 
-    table = PrettyTable()
-    table.field_names = ["Time Zone", "Time"]
+    if converted_time:
+        table = PrettyTable()
+        table.field_names = ["Time Zone", "Time"]
 
-    if args.standard:
-        append_to_table(table, standard_timezones, converted_time)
-    if args.standard and args.daylight:
-        table.add_divider()
-    if args.daylight:
-        append_to_table(table, daylight_timezones, converted_time)
+        if args.standard:
+            append_to_table(table, standard_timezones, converted_time)
+        if args.standard and args.daylight:
+            table.add_divider()
+        if args.daylight:
+            append_to_table(table, daylight_timezones, converted_time)
 
-    print(table)
+        print(table)
 
     input("Press ENTER ...")
 
@@ -39,11 +44,14 @@ def get_args() -> argparse.Namespace:
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("-t", "--time")
+    parser.add_argument("-t", "--time",
+                        help="The time to convert. Can be in 12 hour or 24 hour")
     parser.add_argument("-s", "--standard",
                         action="store_true")
     parser.add_argument("-d", "--daylight",
                         action="store_true")
+    parser.add_argument("-z", "--timezone",
+                        help="Currently not used. Using this argument does nothing.")
 
     args = parser.parse_args()
 
@@ -88,12 +96,12 @@ def convert_to_time(time_to_convert:str) -> datetime.datetime:
 
 def append_to_table(table:PrettyTable, time_dict:dict, entered_time:datetime.datetime) -> None:
     if time_dict == standard_timezones:
-        table.add_row(["MST", str(entered_time.hour).rjust(2, "0") + ":" + str(entered_time.minute).ljust(2, "0")])
+        table.add_row(["MST", str(entered_time.hour).rjust(2, "0") + ":" + str(entered_time.minute).rjust(2, "0")])
     else:
-        table.add_row(["MDT", str(entered_time.hour).rjust(2, "0") + ":" + str(entered_time.minute).ljust(2, "0")])
+        table.add_row(["MDT", str(entered_time.hour).rjust(2, "0") + ":" + str(entered_time.minute).rjust(2, "0")])
 
     for key,item in time_dict.items():
-        table.add_row([key, str((entered_time + item).hour).rjust(2, "0") + ":" + str((entered_time + item).minute).ljust(2, "0")])
+        table.add_row([key, str((entered_time + item).hour).rjust(2, "0") + ":" + str((entered_time + item).minute).rjust(2, "0")])
 
 
 if __name__ == "__main__":
