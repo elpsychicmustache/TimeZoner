@@ -9,18 +9,18 @@ There are a couple of ways to run this program.
 
 ### Running as a CLI one-liner
 Let us assume you want to know the times for users if your time is 9:00 MST.
-1. Run 'python src/time_zoner.py -t "9:00"'
+1. Run `python src/time_zoner.py -t "9:00"`
 2. Observe that the program spits out different zones based on the time frame you entered.
 
 ### Running with no arguments
 The program lets you run the program without any arguments.
 
-Running 'python src/time_zoner.py' prompts the user for the time they would like to use.
+Running `python src/time_zoner.py` prompts the user for the time they would like to use.
 
 ## How to install this project
 You need to install the requirements to your environment.
 
-To do so, run pip install -r requirements.txt from the project's root folder.
+To do so, run `pip install -r requirements.txt` from the project's root folder.
 
 ## How to use this project in your own builds
 The file src/timezones.py contains the timezones based on standard or daylight savings time.
