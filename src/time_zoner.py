@@ -1,9 +1,10 @@
 import argparse
 import datetime
 import re
+import zoneinfo
 
 from prettytable import PrettyTable
-from timezones import standard_timezones, daylight_timezones
+from timezones import zones
 
 def main() -> None:
     args:argparse.Namespace = get_args()
@@ -11,7 +12,7 @@ def main() -> None:
     # if now is provided, then use the time as of right now
     if args.now:
         now = datetime.datetime.today()
-        time_to_convert:str = str(now.hour) + ":" + str(now.minute)
+        time_to_convert:str = str(now.hour).rjust(2, "0") + ":" + str(now.minute).rjust(2, "0")
     # else get args.time or create the time
     elif not args.time:
         time_to_convert:str = input("[+] Please enter the time to convert: ")
@@ -30,13 +31,9 @@ def main() -> None:
         table = PrettyTable()
         table.field_names = ["Time Zone", "Time"]
 
-        if args.standard:
-            append_to_table(table, standard_timezones, converted_time)
-        if args.standard and args.daylight:
-            table.add_divider()
-        if args.daylight:
-            append_to_table(table, daylight_timezones, converted_time)
+        times = build_zones_dict(converted_time)
 
+        append_to_table(table, times)
         print(table)
 
     input("Press ENTER ...")
@@ -58,19 +55,10 @@ def get_args() -> argparse.Namespace:
                         help="Use the current time to convert.",
                         action="store_true")
 
-    parser.add_argument("-s", "--standard",
-                        action="store_true")
-    parser.add_argument("-d", "--daylight",
-                        action="store_true")
     parser.add_argument("-z", "--timezone",
                         help="Currently not used. Using this argument does nothing.")
 
     args = parser.parse_args()
-
-    # if user did not provide standard or daylight, just set both to True
-    if not args.standard and not args.daylight:
-        args.standard = True
-        args.daylight = True
 
     return args
 
@@ -103,7 +91,7 @@ def convert_to_military(time_to_convert:str) -> str:
     return time_to_convert
 
 
-def convert_to_time(time_to_convert:str) -> datetime.datetime:
+def convert_to_time(time_to_convert:str, timezone="Mountain") -> datetime.datetime:
     hours_minutes_list = time_to_convert.split(":")
     today = datetime.date.today()
     return datetime.datetime(
@@ -112,17 +100,26 @@ def convert_to_time(time_to_convert:str) -> datetime.datetime:
             day=today.day,
             hour=int(hours_minutes_list[0]),
             minute=int(hours_minutes_list[1]),
+            tzinfo=zones.get(timezone)
             )
 
 
-def append_to_table(table:PrettyTable, time_dict:dict, entered_time:datetime.datetime) -> None:
-    if time_dict == standard_timezones:
-        table.add_row(["MST", str(entered_time.hour).rjust(2, "0") + ":" + str(entered_time.minute).rjust(2, "0")])
-    else:
-        table.add_row(["MDT", str(entered_time.hour).rjust(2, "0") + ":" + str(entered_time.minute).rjust(2, "0")])
+def build_zones_dict(time_to_convert:datetime.datetime, zones:dict[str,"TimeZone"]=zones) -> dict[str, datetime.datetime]:
+    zone_dict = {}
 
-    for key,item in time_dict.items():
-        table.add_row([key, str((entered_time + item).hour).rjust(2, "0") + ":" + str((entered_time + item).minute).rjust(2, "0")])
+    # Add the time (and timezone) from time_to_convert
+    zone_dict[time_to_convert.tzname()] = str(time_to_convert.hour).rjust(2, "0") + ":" + str(time_to_convert.minute).rjust(2, "0")
+
+    for zone in zones.keys():
+        new_time:datetime.datetime = time_to_convert.astimezone(zones[zone])
+        zone_dict[new_time.tzname()] = str(new_time.hour).rjust(2, "0") + ":" + str(new_time.minute).rjust(2, "0")
+
+    return zone_dict
+
+
+def append_to_table(table:PrettyTable, time_dict:dict) -> None:
+    for time in time_dict.keys():
+        table.add_row([time, time_dict[time]])
 
 
 if __name__ == "__main__":

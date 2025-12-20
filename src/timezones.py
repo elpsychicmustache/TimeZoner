@@ -1,20 +1,18 @@
-from datetime import timedelta
+from zoneinfo import ZoneInfo
 
-standard_timezones = {
-        "CST": timedelta(hours=1),
-        "EST": timedelta(hours=2),
-        "PST": timedelta(hours=-1),
-        "IST": timedelta(hours=12, minutes=30),
-        "GMT": timedelta(hours=7),
-        "UTC": timedelta(hours=7),
+zones = {
+        # America time zones
+        "Mountain":ZoneInfo("America/Denver"),
+        "Arizona":ZoneInfo("America/Phoenix"),
+        "Pacific":ZoneInfo("America/Los_Angeles"),
+        "Central":ZoneInfo("America/Chicago"),
+        "Eastern":ZoneInfo("America/New_York"),
+        # European
+        "Central_European":ZoneInfo("Europe/Madrid"),
+        "British":ZoneInfo("Europe/London"),
+        # Asia
+        "India":ZoneInfo("Asia/Kolkata"),
+        # UTC
+        "UTC":ZoneInfo("UTC")
         }
 
-daylight_timezones = {
-        "CDT": timedelta(hours=1),
-        "EDT": timedelta(hours=2),
-        "PDT": timedelta(hours=-1),
-        "MST": timedelta(hours=-1),
-        "BST": timedelta(hours=7),
-        "IST": timedelta(hours=11, minutes=30),
-        "UTC": timedelta(hours=6),
-        }
