@@ -13,30 +13,33 @@ def main() -> None:
     if args.now:
         now = datetime.datetime.today()
         time_to_convert:str = str(now.hour).rjust(2, "0") + ":" + str(now.minute).rjust(2, "0")
-    # else get args.time or create the time
+    # else get args.time or ask user to create the time
     elif not args.time:
         time_to_convert:str = input("[+] Please enter the time to convert: ")
     else:
         time_to_convert = args.time
 
+    # Try/catch block to control flow if user provides or enters an incorrect time format.
     try:
-        validate_format(time_to_convert)
+        validate_format(time_to_convert)  # Throws ValueError if the user does not enter a valid time.
         military_time:str = convert_to_military(time_to_convert)
         converted_time:datetime.datetime = convert_to_time(military_time)
     except ValueError:
         print(f"[!] {time_to_convert} is not a valid time. Some examples to try: '21:00' or '9:00 PM'")
-        converted_time = None
-
-    if converted_time:
-        table = PrettyTable()
-        table.field_names = ["Time Zone", "Time"]
-
+    else:
+        # Build the times based on ZoneInfo objects
         times = build_zones_dict(converted_time)
 
+        # Build the table
+        table = PrettyTable()
+        table.field_names = ["Time Zone", "Time"]
         append_to_table(table, times)
-        print(table)
 
-    input("Press ENTER ...")
+        # Show the table
+        print(table)
+    finally:
+        # Pause for the user to press ENTER in case the console auto-clears the screen
+        input("Press ENTER ...")
 
 
 def get_args() -> argparse.Namespace:
