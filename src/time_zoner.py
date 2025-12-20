@@ -1,5 +1,6 @@
 import argparse
 import datetime
+import re
 
 from prettytable import PrettyTable
 from timezones import standard_timezones, daylight_timezones
@@ -12,8 +13,9 @@ def main() -> None:
     else:
         time_to_convert = args.time
 
-    military_time:str = convert_to_military(time_to_convert)
     try:
+        validate_format(time_to_convert)
+        military_time:str = convert_to_military(time_to_convert)
         converted_time:datetime.datetime = convert_to_time(military_time)
     except ValueError:
         print(f"[!] {time_to_convert} is not a valid time. Some examples to try: '21:00' or '9:00 PM'")
@@ -61,6 +63,15 @@ def get_args() -> argparse.Namespace:
         args.daylight = True
 
     return args
+
+
+def validate_format(time_to_check) -> None:
+    time = re.compile("^(?:(([01]?[0-9]|2[0-3]):([0-5][0-9]))|(([1-9]|1[0-2]):([0-5][0-9]) ?(AM|PM)))$", re.I)
+
+    if time.match(time_to_check.strip()):
+        pass
+    else:
+        raise ValueError
 
 
 def convert_to_military(time_to_convert:str) -> str:
