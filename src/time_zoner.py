@@ -66,7 +66,22 @@ def get_args() -> argparse.Namespace:
     return args
 
 
-def validate_format(time_to_check) -> None:
+def validate_format(time_to_check:str) -> None:
+    """Validate the format of a time as a string using regex
+
+    Needs to be in 12 or 24-hour format. No space between AM/PM and the time is just fine.
+    In other words, 9:00PM and 9:00 PM will both work.
+
+    There are also rules built in to try to minimize invalid times.
+    For example, the following inputs will NOT work:
+    - 24:00
+    - 13:00 AM
+    - 000:004
+    - 12:68 PM
+
+    :param time_to_check: The string to validate is in a proper time format.
+    :type time_to_check: str
+    """
     time = re.compile("^(?:(([01]?[0-9]|2[0-3]):([0-5][0-9]))|(([1-9]|1[0-2]):([0-5][0-9]) ?(AM|PM)))$", re.I)
 
     if time.match(time_to_check.strip()):
@@ -76,6 +91,16 @@ def validate_format(time_to_check) -> None:
 
 
 def convert_to_military(time_to_convert:str) -> str:
+    """Attempts to convert a time entered in 12-hour into 24-hour time.
+
+    If the time is in 24-hour this method does nothing.
+
+    :param time_to_convert: The time to check and convert.
+    :type time_time_convert: str
+    :returns: Returns the 24-hour time of time_to_convert.
+    :rtype: str
+    """
+
     if "am" in time_to_convert.lower():
         time_to_convert = time_to_convert.lower().replace("am", "").strip()
         time_to_convert_split:list = time_to_convert.split(":")
@@ -95,6 +120,17 @@ def convert_to_military(time_to_convert:str) -> str:
 
 
 def convert_to_time(time_to_convert:str, timezone="Mountain") -> datetime.datetime:
+    """Transforms a time as a string into a datetime object.
+
+    This will assume that the time is for today. More wore will be needed to accomodate different days.
+
+    :param time_to_convert: The time to turn into a datetime object.
+    :type time_to_convert: str
+    :param timezone: The key from timezones to use for the timezone.
+    :type timezone: str
+    :returns: The datetime object from time_to_convert
+    :rtype: datetime.datetime
+    """
     hours_minutes_list = time_to_convert.split(":")
     today = datetime.date.today()
     return datetime.datetime(
@@ -108,6 +144,15 @@ def convert_to_time(time_to_convert:str, timezone="Mountain") -> datetime.dateti
 
 
 def build_zones_dict(time_to_convert:datetime.datetime, zones:dict[str,"TimeZone"]=zones) -> dict[str, datetime.datetime]:
+    """Creates a dictionary of timezone keys and datetime objects as values.
+
+    :param time_to_convert: The original datetime object from which to assume all other times.
+    :type time_to_convert: datetime.datetime
+    :param zones: A dictionary of string keys and TimeZone objects
+    :type zones: dict[str, TimeZone]
+    :returns: A dictionary of timezone keys (i.e. PST, MDT, etc.) and datetime objects based off of time_to_convert.
+    :rtype: dict[str, datetime.datetime]
+    """
     zone_dict = {}
 
     # Add the time (and timezone) from time_to_convert
@@ -121,6 +166,13 @@ def build_zones_dict(time_to_convert:datetime.datetime, zones:dict[str,"TimeZone
 
 
 def append_to_table(table:PrettyTable, time_dict:dict) -> None:
+    """Runs through time_dict and adds it to the PrettyTable object
+
+    :param table: The PrettyTable object to add timezone information to.
+    :type table: PrettyTable
+    :param time_dict: The dictionary of timezones and datetime objects.
+    :type time_dict: dict[str, datetime.datetime]
+    """
     for time in time_dict.keys():
         table.add_row([time, time_dict[time]])
 
