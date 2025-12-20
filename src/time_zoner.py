@@ -23,7 +23,7 @@ def main() -> None:
     try:
         validate_format(time_to_convert)  # Throws ValueError if the user does not enter a valid time.
         military_time:str = convert_to_military(time_to_convert)
-        converted_time:datetime.datetime = convert_to_time(military_time)
+        converted_time:datetime.datetime = convert_to_time(military_time, args.timezone)
     except ValueError:
         print(f"[!] {time_to_convert} is not a valid time. Some examples to try: '21:00' or '9:00 PM'")
     else:
@@ -59,6 +59,8 @@ def get_args() -> argparse.Namespace:
                         action="store_true")
 
     parser.add_argument("-z", "--timezone",
+                        choices=[time_key for time_key in zones.keys()],
+                        default="Mountain",
                         help="Currently not used. Using this argument does nothing.")
 
     args = parser.parse_args()
