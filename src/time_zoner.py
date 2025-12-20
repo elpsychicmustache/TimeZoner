@@ -8,7 +8,12 @@ from timezones import standard_timezones, daylight_timezones
 def main() -> None:
     args:argparse.Namespace = get_args()
 
-    if not args.time:
+    # if now is provided, then use the time as of right now
+    if args.now:
+        now = datetime.datetime.today()
+        time_to_convert:str = str(now.hour) + ":" + str(now.minute)
+    # else get args.time or create the time
+    elif not args.time:
         time_to_convert:str = input("[+] Please enter the time to convert: ")
     else:
         time_to_convert = args.time
@@ -46,8 +51,13 @@ def get_args() -> argparse.Namespace:
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("-t", "--time",
+    time_group = parser.add_mutually_exclusive_group()
+    time_group.add_argument("-t", "--time",
                         help="The time to convert. Can be in 12 hour or 24 hour")
+    time_group.add_argument("-n", "--now",
+                        help="Use the current time to convert.",
+                        action="store_true")
+
     parser.add_argument("-s", "--standard",
                         action="store_true")
     parser.add_argument("-d", "--daylight",
