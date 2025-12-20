@@ -8,9 +8,13 @@ This CLI program helps users collaborate with other users/partners who exist in 
 There are a couple of ways to run this program.
 
 ### Running as a CLI one-liner
-Let us assume you want to know the times for users if your time is 9:00 MST.
-1. Run `python src/time_zoner.py -t "9:00"` from the project's root directory.
+Let us assume you want to know the times for users if your time is 9:00 AM MT.
+1. Run `python src/time_zoner.py -t "9:00 AM"` or `python src/time_zoner.py -t "9:00" from the project's root directory.
+    - Note: this program can use 12 or 24-hour time. However, conversions will only be displayed in 24-hour time.
 2. Observe that the program spits out different zones based on the time frame you entered.
+
+You can also use your current time with the `-n` flag:
+1. Run 'python src/time_zoner.py -n`, which creates time conversions based on the user's current time.
 
 ### Running with no arguments
 The program lets you run the program without any arguments.
@@ -23,15 +27,19 @@ You need to install the requirements to your environment.
 To do so, run `pip install -r requirements.txt` from the project's root directory.
 
 ## How to use this project in your own builds
-The file 'src/timezones.py' contains the timezones based on standard or daylight savings time.
+The file 'src/timezones.py' contains the ZoneInfo objects (which are used to create conversions).
 
-To add a new timezone, please enter it by copying the other examples, but ensure you are setting hours= in respect to MDT (daylight) or MST (standard).
-For example, let us assume there is a fictional timezone called "XYZ" that is 3 hours ahead of MDT.
+This is just a dictionary with a simple "zone" description - like "Mountain" and the ZoneInfo() object.
+`dict["A string descriptor": ZoneInfo("TimeZoneKey")]`
 
-I would add the following entry to `daylight_timezones`:
-`"XYZ": timedelta(hours=3),`
+For example:
+I would add Brisbane, Australia to the conversion table. I need to add the following entry:
+`"Brisbane Australia": ZoneInfo("Australia/Brisbane"),`
+This will pull in the appropriate time for Brisbane when you run the program.
 
-This will pull in the timezone whenever the program displays daylight savings timezones.
+To obtain more timezones you can add, please run in the python interpreter:
+`import zoneinfo`
+`zoneinfo.available_timezones()`
 
 ## How to contribute
 This is a very simple program currently. Not a lot of thought has been put into it as it was created to simplify things for myself.
