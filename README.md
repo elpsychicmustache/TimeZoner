@@ -4,6 +4,10 @@
 
 This CLI program helps users collaborate with other users/partners who exist in different time zones. **This program, currently, assumes that the user is in Mountain Time.** More work will be required to determine the user's timezone and then make changes accordingly.
 
+### ValueError upon running
+If you get a ValueError stating: "Time zone data does not exist in this system. Please run 'pip install tzdata' to populate the timezone database for zoneinfo"
+then you will need to run `pip install tzdata' to populate the timezone database for zoneinfo.
+
 ## Steps to run
 There are a couple of ways to run this program.
 

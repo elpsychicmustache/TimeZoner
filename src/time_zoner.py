@@ -9,6 +9,10 @@ from timezones import zones
 def main() -> None:
     args:argparse.Namespace = get_args()
 
+    # Checking to make sure the timezone database is populated; otherwise, throw an error
+    if not zoneinfo.available_timezones():
+        raise ValueError("Time zone data does not exist in this system. Please run 'pip install tzdata' to populate the timezone database for zoneinfo.")
+
     # if now is provided, then use the time as of right now
     if args.now:
         now = datetime.datetime.today()
